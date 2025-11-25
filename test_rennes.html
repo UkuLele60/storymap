@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz cartographique - Où est Rennes ?</title>
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    header {
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid #ddd;
+    }
+    h1 {
+      font-size: 1.1rem;
+      margin: 0 0 0.25rem 0;
+    }
+    #instructions {
+      font-size: 0.9rem;
+      color: #444;
+    }
+    #message {
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    #controls {
+      margin-top: 0.3rem;
+    }
+    #controls button {
+      font-size: 0.8rem;
+      padding: 0.2rem 0.5rem;
+      cursor: pointer;
+    }
+    #map {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>Quiz cartographique : Où se trouve Rennes ?</h1>
+    <div id="instructions">
+      Clique sur la carte pour indiquer où tu penses que se trouve la ville de <strong>Rennes</strong>.
+    </div>
+    <div id="message">En attente de ta première réponse…</div>
+    <div id="controls">
+      <button id="show-answer">Afficher la bonne réponse</button>
+    </div>
+  </header>
+  <div id="map"></div>
+</div>
+
+<!-- Leaflet JS -->
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+
+<!-- Turf.js pour le calcul de distance -->
+<script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+
+<script>
+  // Coordonnées de Rennes (approx.)
+  const rennesLat = 48.1173;
+  const rennesLng = -1.6778;
+  const targetPoint = turf.point([rennesLng, rennesLat]);
+
+  // Tolérance en km
+  const toleranceKm = 30;
+
+  // Carte centrée sur la France
+  const map = L.map('map').setView([47.5, 2], 5.5);
+
+  // ◼️ FOND DE PLAN SANS LABEL
+  L.tileLayer(
+    "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
+    {
+      attribution: "&copy; CartoDB (no labels)",
+      maxZoom: 19
+    }
+  ).addTo(map);
+
+  let clickMarker = null;
+  let answerMarker = null;
+
+  const messageDiv = document.getElementById('message');
+
+  // Clic utilisateur
+  map.on('click', function (e) {
+    const userLat = e.latlng.lat;
+    const userLng = e.latlng.lng;
+
+    if (clickMarker) map.removeLayer(clickMarker);
+    clickMarker = L.marker([userLat, userLng]).addTo(map);
+
+    const userPoint = turf.point([userLng, userLat]);
+    const distance = turf.distance(userPoint, targetPoint, { units: 'kilometers' });
+    const d = Math.round(distance * 10) / 10;
+
+    if (distance <= toleranceKm) {
+      messageDiv.textContent = `✅ Bravo ! Vous êtes à ${d} km de Rennes (tolérance : ${toleranceKm} km).`;
+    } else {
+      messageDiv.textContent = `❌ Raté ! Vous êtes à ${d} km de Rennes (tolérance : ${toleranceKm} km).`;
+    }
+  });
+
+  // Bouton : montrer Rennes
+  document.getElementById('show-answer').addEventListener('click', function () {
+    if (answerMarker) map.removeLayer(answerMarker);
+
+    answerMarker = L.marker([rennesLat, rennesLng])
+      .addTo(map)
+      .bindPopup("Rennes (bonne réponse)")
+      .openPopup();
+
+    map.setView([rennesLat, rennesLng], 8);
+  });
+</script>
+</body>
+</html>
