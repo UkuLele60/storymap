@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Quiz cartographique - Où est Rennes ?</title>
+  <title>Quiz cartographique - Où est Ouidah ?</title>
 
   <!-- Leaflet CSS -->
   <link
@@ -57,9 +57,9 @@
 <body>
 <div id="app">
   <header>
-    <h1>Quiz cartographique : Où se trouve Rennes ?</h1>
+    <h1>Quiz cartographique : Où se trouve Ouidah ?</h1>
     <div id="instructions">
-      Clique sur la carte pour indiquer où tu penses que se trouve la ville de <strong>Rennes</strong>.
+      Clique sur la carte pour indiquer où tu penses que se trouve la ville de <strong>Ouidah</strong>.
     </div>
     <div id="message">En attente de ta première réponse…</div>
     <div id="controls">
@@ -80,16 +80,16 @@
 <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
 
 <script>
-  // Coordonnées de Rennes (approx.)
-  const rennesLat = 48.1173;
-  const rennesLng = -1.6778;
-  const targetPoint = turf.point([rennesLng, rennesLat]);
+  // Coordonnées de Ouidah (Bénin)
+  const ouidahLat = 6.3640;
+  const ouidahLng = 2.0851;
+  const targetPoint = turf.point([ouidahLng, ouidahLat]);
 
   // Tolérance en km
   const toleranceKm = 30;
 
-  // Carte centrée sur la France
-  const map = L.map('map').setView([47.5, 2], 5.5);
+  // Carte centrée sur l'Afrique de l’Ouest
+  const map = L.map('map').setView([7.5, 1.5], 6);
 
   // ◼️ FOND DE PLAN SANS LABEL
   L.tileLayer(
@@ -118,22 +118,22 @@
     const d = Math.round(distance * 10) / 10;
 
     if (distance <= toleranceKm) {
-      messageDiv.textContent = `✅ Bravo ! Vous êtes à ${d} km de Rennes (tolérance : ${toleranceKm} km).`;
+      messageDiv.textContent = `✅ Bravo ! Vous êtes à ${d} km de Ouidah (tolérance : ${toleranceKm} km).`;
     } else {
-      messageDiv.textContent = `❌ Raté ! Vous êtes à ${d} km de Rennes (tolérance : ${toleranceKm} km).`;
+      messageDiv.textContent = `❌ Raté ! Vous êtes à ${d} km de Ouidah (tolérance : ${toleranceKm} km).`;
     }
   });
 
-  // Bouton : montrer Rennes
+  // Bouton : montrer Ouidah
   document.getElementById('show-answer').addEventListener('click', function () {
     if (answerMarker) map.removeLayer(answerMarker);
 
-    answerMarker = L.marker([rennesLat, rennesLng])
+    answerMarker = L.marker([ouidahLat, ouidahLng])
       .addTo(map)
-      .bindPopup("Rennes (bonne réponse)")
+      .bindPopup("Ouidah (bonne réponse)")
       .openPopup();
 
-    map.setView([rennesLat, rennesLng], 8);
+    map.setView([ouidahLat, ouidahLng], 10);
   });
 </script>
 </body>
