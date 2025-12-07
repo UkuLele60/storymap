@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Frise Ouidah 1472–1890</title>
+  <style>
+    :root {
+      --benin-green: #008751;
+      --benin-yellow: #fcd116;
+      --benin-red: #e03c32;
+      --bg-light: #f6f5f0;
+      --text-dark: #222;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      padding: 40px 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .page {
+      max-width: 1100px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 10px;
+      position: relative;
+      text-transform: none;
+    }
+
+    h1::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: -8px;
+      width: 75%;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(
+        90deg,
+        var(--benin-green),
+        var(--benin-yellow),
+        var(--benin-red)
+      );
+      opacity: 0.9;
+    }
+
+    .timeline-card {
+      margin-top: 40px;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 24px 28px 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .timeline-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .timeline-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #444;
+    }
+
+    #controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    #controls button {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid #cccccc;
+      background: #f5f5f5;
+      color: #333;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+
+    #controls button:hover {
+      background: #ffffff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+    }
+
+    #controls button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .timeline-wrapper {
+      margin-top: 8px;
+      position: relative;
+    }
+
+    .timeline-inner {
+	position: relative;
+	height: 400px; /* nouvelle hauteur */
+	margin-top: 10px;
+}
+
+
+    .timeline-line {
+      position: absolute;
+      left: 4%;
+      right: 4%;
+      top: 50%;
+      height: 3px;
+      transform: translateY(-50%);
+      background: linear-gradient(
+        90deg,
+        var(--benin-green),
+        var(--benin-yellow),
+        var(--benin-red)
+      );
+      border-radius: 999px;
+      opacity: 0.8;
+    }
+
+    .timeline-event {
+      position: absolute;
+      bottom: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .timeline-event.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .event-dot {
+      position: absolute;
+      left: 50%;
+      bottom: -6px; /* centre de la pastille pile sur la ligne */
+      transform: translateX(-50%);
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--benin-red);
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .timeline-event.highlight .event-dot {
+      background: var(--benin-yellow);
+      transform: translateX(-50%) scale(1.2);
+      box-shadow: 0 0 0 3px rgba(252, 209, 22, 0.55);
+    }
+
+    .event-label {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 140px;
+      max-width: 180px;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 8px 10px 7px 12px;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: #333;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+      border-left: 5px solid var(--benin-green);
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.2s ease, box-shadow 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .timeline-event.highlight .event-label {
+      border-color: var(--benin-red);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    .event-label.top {
+      /* Écartée davantage au-dessus de la ligne */
+      transform: translate(-50%, -180px);
+    }
+
+    .event-label.bottom {
+      /* Écartée davantage en dessous de la ligne */
+      transform: translate(-50%, 60px);
+    }
+
+    .event-year {
+      font-weight: 700;
+      color: var(--benin-green);
+      margin-bottom: 2px;
+      font-size: 0.9rem;
+    }
+
+    .event-text {
+      font-weight: 500;
+      font-size: 0.83rem;
+    }
+
+    @media (max-width: 768px) {
+      .timeline-inner {
+        height: 300px;
+      }
+      .event-label {
+        max-width: 150px;
+        font-size: 0.8rem;
+      }
+      .event-label.top {
+        transform: translate(-50%, -130px);
+      }
+      .event-label.bottom {
+        transform: translate(-50%, 45px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Évolution historique du port de Ouidah de 1472 à 1890 (Law, 2004)</h1>
+
+    <div class="timeline-card">
+      <div class="timeline-header">
+        <!-- Titre de section supprimé (on laisse le conteneur vide) -->
+        <div class="timeline-title"></div>
+        <div id="controls">
+          <button id="btn-play">Lancer l'animation de la frise</button>
+          <button id="btn-show-all">Afficher tous les événements</button>
+        </div>
+      </div>
+
+      <div class="timeline-wrapper">
+        <div class="timeline-inner" id="timeline">
+          <div class="timeline-line"></div>
+
+          <!-- Événements : positions horizontales calculées en JS -->
+          <!-- Intitulés simples comme sur la frise PNG -->
+
+          <!-- 1472 -->
+<div class="timeline-event" data-year="1472" data-side="top">
+  <div class="event-dot"></div>
+  <div class="event-label top">
+    <div class="event-year">1472</div>
+    <div class="event-text">Exploration portugaise</div>
+  </div>
+</div>
+
+<!-- 1550 -->
+<div class="timeline-event" data-year="1550" data-side="bottom">
+  <div class="event-dot"></div>
+  <div class="event-label bottom">
+    <div class="event-year">XVIᵉ siècle</div>
+    <div class="event-text">Commerce européen régulier</div>
+  </div>
+</div>
+
+<!-- 1670 -->
+<div class="timeline-event" data-year="1670" data-side="top">
+  <div class="event-dot"></div>
+  <div class="event-label top">
+    <div class="event-year">1670s</div>
+    <div class="event-text">Amplification de la traite</div>
+  </div>
+</div>
+
+<!-- 1680 -->
+<div class="timeline-event" data-year="1680" data-side="bottom">
+  <div class="event-dot"></div>
+  <div class="event-label bottom">
+    <div class="event-year">1680s</div>
+    <div class="event-text">Le royaume du Dahomey devient le fournisseur majeur d'esclave dans la région.</div>
+  </div>
+</div>
+
+<!-- 1690 -->
+<div class="timeline-event" data-year="1690" data-side="top">
+  <div class="event-dot"></div>
+  <div class="event-label top">
+    <div class="event-year">1690s</div>
+    <div class="event-text">≈ 10 000 esclaves par an transitent par Ouidah.</div>
+  </div>
+</div>
+
+<!-- 1727 -->
+<div class="timeline-event" data-year="1727" data-side="bottom">
+  <div class="event-dot"></div>
+  <div class="event-label bottom">
+    <div class="event-year">1727</div>
+    <div class="event-text">Conquête de Hueda par le royaume du Dahomey</div>
+  </div>
+</div>
+
+<!-- 1732 -->
+<div class="timeline-event" data-year="1732" data-side="top">
+  <div class="event-dot"></div>
+  <div class="event-label top">
+    <div class="event-year">1732</div>
+    <div class="event-text">Destruction du port de Jakin par le Dahomey. Ouidah devient le seul port de traite de la région.</div>
+  </div>
+</div>
+
+<!-- 1770 -->
+<div class="timeline-event" data-year="1770" data-side="bottom">
+  <div class="event-dot"></div>
+  <div class="event-label bottom">
+    <div class="event-year">1770s</div>
+    <div class="event-text">Le Dahomey peine à fournir des captifs</div>
+  </div>
+</div>
+
+<!-- 1790 -->
+<div class="timeline-event" data-year="1790" data-side="top">
+  <div class="event-dot"></div>
+  <div class="event-label top">
+    <div class="event-year">1790s</div>
+    <div class="event-text">Marché et prix de la traite stabilisés</div>
+  </div>
+</div>
+
+<!-- ⚠️ NOUVELLES DATES D’ABOLITION DE LA TRAITE -->
+
+<!-- 1807 Royaume-Uni -->
+<div class="timeline-event" data-year="1807" data-side="bottom">
+  <div class="event-dot"></div>
+  <div class="event-label bottom">
+    <div class="event-year">1807</div>
+    <div class="event-text">Abolition britannique de la traite</div>
+  </div>
+</div>
+
+<!-- 1808 États-Unis -->
+<div class="timeline-event" data-year="1808" data-side="top">
+  <div class="event-dot"></div>
+  <div class="event-label top">
+    <div class="event-year">1808</div>
+    <div class="event-text">Abolition américaine de la traite</div>
+  </div>
+</div>
+
+<!-- 1815 Portugal (Nord de l’équateur) -->
+<div class="timeline-event" data-year="1815" data-side="bottom">
+  <div class="event-dot"></div>
+  <div class="event-label bottom">
+    <div class="event-year">1815</div>
+    <div class="event-text">Interdiction portugaise de la traite au nord de l’équateur</div>
+  </div>
+</div>
+
+<!-- 1818 France -->
+<div class="timeline-event" data-year="1818" data-side="top">
+  <div class="event-dot"></div>
+  <div class="event-label top">
+    <div class="event-year">1818</div>
+    <div class="event-text">Abolition française de la traite</div>
+  </div>
+</div>
+
+<!-- 1823 -->
+<div class="timeline-event" data-year="1823" data-side="bottom">
+  <div class="event-dot"></div>
+  <div class="event-label bottom">
+    <div class="event-year">1823</div>
+    <div class="event-text">Guerre Dahomey-Oyo : perturbation de la traite</div>
+  </div>
+</div>
+
+<!-- 1850 -->
+<div class="timeline-event" data-year="1850" data-side="top">
+  <div class="event-dot"></div>
+  <div class="event-label top">
+    <div class="event-year">~1850</div>
+    <div class="event-text">Déclin de la traite</div>
+  </div>
+</div>
+
+<!-- 1857 -->
+<div class="timeline-event" data-year="1857" data-side="bottom">
+  <div class="event-dot"></div>
+  <div class="event-label bottom">
+    <div class="event-year">1857</div>
+    <div class="event-text">Fin de la traite illégale</div>
+  </div>
+</div>
+
+<!-- 1890 -->
+<div class="timeline-event" data-year="1890" data-side="top">
+  <div class="event-dot"></div>
+  <div class="event-label top">
+    <div class="event-year">1890s</div>
+    <div class="event-text">Transition post-esclavagiste</div>
+  </div>
+</div>
+
+  <script>
+    (function () {
+      const timeline = document.getElementById("timeline");
+      const eventEls = Array.from(
+        timeline.querySelectorAll(".timeline-event")
+      );
+
+      // Tri chronologique
+      eventEls.sort((a, b) => {
+        return (
+          parseInt(a.dataset.year, 10) - parseInt(b.dataset.year, 10)
+        );
+      });
+
+      const years = eventEls.map((el) => parseInt(el.dataset.year, 10));
+      const minYear = Math.min(...years);
+      const maxYear = Math.max(...years);
+
+      // Positionner proportionnellement dans le temps
+      eventEls.forEach((el) => {
+        const year = parseInt(el.dataset.year, 10);
+        const ratio =
+          (year - minYear) / (maxYear - minYear || 1);
+        const leftPercent = 4 + ratio * 92; // marges de 4% à gauche/droite
+        el.style.left = leftPercent + "%";
+      });
+
+      const btnPlay = document.getElementById("btn-play");
+      const btnShowAll = document.getElementById("btn-show-all");
+
+      let currentIndex = -1;
+      let playing = false;
+      let timerId = null;
+      const intervalMs = 2600; // rythme de lecture
+
+      function clearHighlight() {
+        eventEls.forEach((el) => el.classList.remove("highlight"));
+      }
+
+      function showUpTo(index) {
+        eventEls.forEach((el, i) => {
+          if (i <= index) {
+            el.classList.add("visible");
+          } else {
+            el.classList.remove("visible");
+            el.classList.remove("highlight");
+          }
+        });
+      }
+
+      function step() {
+        if (currentIndex < eventEls.length - 1) {
+          currentIndex++;
+          showUpTo(currentIndex);
+          clearHighlight();
+          eventEls[currentIndex].classList.add("highlight");
+        } else {
+          stopPlaying(); // fin de l'animation
+        }
+      }
+
+      function startPlaying() {
+        if (playing) return;
+
+        // Si on est déjà au bout (fin d’une animation précédente
+        // ou "Afficher tous les événements"), on repart de zéro
+        if (currentIndex >= eventEls.length - 1) {
+          currentIndex = -1;
+          eventEls.forEach((el) => {
+            el.classList.remove("visible");
+            el.classList.remove("highlight");
+          });
+        }
+
+        playing = true;
+        btnPlay.textContent = "Mettre en pause";
+        step();
+        timerId = setInterval(step, intervalMs);
+      }
+
+      function stopPlaying() {
+        playing = false;
+        btnPlay.textContent = "Lancer l'animation de la frise";
+        if (timerId) {
+          clearInterval(timerId);
+          timerId = null;
+        }
+      }
+
+      btnPlay.addEventListener("click", () => {
+        if (playing) {
+          stopPlaying();
+        } else {
+          startPlaying();
+        }
+      });
+
+      btnShowAll.addEventListener("click", () => {
+        stopPlaying();
+        currentIndex = eventEls.length - 1;
+        eventEls.forEach((el) => {
+          el.classList.add("visible");
+          el.classList.remove("highlight");
+        });
+      });
+
+      // Cliquer sur un événement pour reprendre à partir de ce point
+      eventEls.forEach((el, index) => {
+        el.addEventListener("click", () => {
+          stopPlaying();
+          currentIndex = index - 1;
+          showUpTo(index);
+          clearHighlight();
+          el.classList.add("highlight");
+          startPlaying();
+        });
+
+        const dot = el.querySelector(".event-dot");
+        const label = el.querySelector(".event-label");
+        [dot, label].forEach((child) => {
+          child.addEventListener("click", (e) => {
+            e.stopPropagation();
+            el.click();
+          });
+        });
+      });
+
+      // Au chargement : frise vide (aucun événement visible)
+      eventEls.forEach((el) => {
+        el.classList.remove("visible");
+        el.classList.remove("highlight");
+      });
+      currentIndex = -1;
+    })();
+  </script>
+</body>
+</html>
