@@ -79,6 +79,16 @@
       text-transform: uppercase;
     }
 
+	.mini-title {
+		font-family: "Poppins", sans-serif; /* comme le h1 */
+		font-weight: 700;                   /* un peu moins que le H1 */
+		font-size: 1.05rem;                 /* plus petit que le titre principal */
+		letter-spacing: 0.5px;
+		text-transform: uppercase;
+		color: #008751;                     /* même vert que le h1 */
+	}
+
+
     #instructions {
       font-size: 0.9rem;
       color: #444;
@@ -240,12 +250,12 @@
   <header>
     <img id="flag-left" class="flag" src="https://www.drapeaux-du-monde.fr/drapeaux-du-monde/3000/drapeau-benin.jpg" alt="Drapeau gauche">
     <div id="header-content">
-      <div id="subtitle">🇧🇯 Quiz géographique • <span>Spécial Bénin</span></div>
       <h1>Où se trouve Ouidah ?</h1>
       <div id="instructions">
-        Clique sur la carte pour indiquer où se trouve <strong>Ouidah</strong>.<br>
-        Tu dois être à moins de <strong>15&nbsp;km</strong> pour réussir&nbsp;!
-      </div>
+  <span class="mini-title">Clique sur la Carte</span><br>
+  Tu dois être à moins de <strong>15 km</strong> pour réussir.
+</div>
+
       <div id="message">En attente de ta première réponse…</div>
       <div id="controls">
         <!-- Afficher à gauche, Recommencer à droite -->
@@ -263,14 +273,14 @@
 <div id="fx-win" class="fx-overlay">
   <div id="fx-win-content">
     <div id="fx-win-title">Bravo&nbsp;!</div>
-    <div id="fx-win-sub">Tu as trouvé Ouidah. <br>Le Bénin peut être fier de toi&nbsp;! 🇧🇯</div>
+    <div id="fx-win-sub">Tu as trouvé Ouidah. <br>Tu peux continuer ta découverte de la Route de l'esclave.</div>
   </div>
 </div>
 
 <div id="fx-lose" class="fx-overlay">
   <div id="fx-lose-content">
     <div id="fx-lose-title">Oups…</div>
-    <div id="fx-lose-sub">Cette fois-ci, tu es un peu trop loin de Ouidah.<br>Essaye encore, tu vas y arriver&nbsp;!</div>
+    <div id="fx-lose-sub">Tu es un peu trop loin de Ouidah.</div>
   </div>
 </div>
 
@@ -404,7 +414,7 @@
       setMessage(`Bravo ! Tu es à ${d} km de Ouidah.`, "ok");
       triggerWinEffect();
     } else {
-      setMessage(`Raté!! Tu es à ${d} km de Ouidah. Courage.`, "ko");
+      setMessage(`Tu es à ${d} km de Ouidah.`, "ko");
       triggerLoseEffect();
     }
   });
